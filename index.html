@@ -1,1 +1,183 @@
-Hello world
+<!DOCTYPE html>
+<html class="no-js"> 
+    <head>
+        <meta charset="utf-8"> 
+        <title>zhonggen blog</title> 
+        <meta name="description" content="anzhonggen personal blog,write IT technical article">
+        <meta name="author" content="anzhonggen">
+        <meta name="robots" content="noindex, nofollow"> 
+        <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1.0"> 
+        <link rel="shortcut icon" href="img/favicon.png">
+        <link rel="apple-touch-icon" href="img/icon57.png" sizes="57x57">
+        <link rel="apple-touch-icon" href="img/icon72.png" sizes="72x72">
+        <link rel="apple-touch-icon" href="img/icon76.png" sizes="76x76">
+        <link rel="apple-touch-icon" href="img/icon114.png" sizes="114x114">
+        <link rel="apple-touch-icon" href="img/icon120.png" sizes="120x120">
+        <link rel="apple-touch-icon" href="img/icon144.png" sizes="144x144">
+        <link rel="apple-touch-icon" href="img/icon152.png" sizes="152x152">
+        <link rel="apple-touch-icon" href="img/icon180.png" sizes="180x180"> 
+        <link rel="stylesheet" href="css/bootstrap.min.css">
+        <link rel="stylesheet" href="css/plugins.css"> 
+        <link rel="stylesheet" href="css/main.css"> 
+        <link rel="stylesheet" href="css/themes.css"> 
+        <script src="js/vendor/modernizr-respond.min.js"></script>
+    </head>
+    <body>
+        <!-- Page Container -->
+        <!-- In the PHP version you can set the following options from inc/config file -->
+        <!-- 'boxed' class for a boxed layout -->
+        <div id="page-container" ng-app="myTodoApp" ng-controller="myHomeCtrl">
+            <!-- Site Header -->
+            <header>
+                <div class="container">
+                    <!-- Site Logo -->
+                    <a href="index.html" class="site-logo">
+                        <strong>Zhg</strong> Blog
+                    </a>
+                    <!-- Site Logo -->
+
+                    <!-- Site Navigation -->
+                    <nav>
+                        <!-- Menu Toggle -->
+                        <!-- Toggles menu on small screens -->
+                        <a href="javascript:void(0)" class="btn btn-default site-menu-toggle visible-xs visible-sm">
+                            <i class="fa fa-bars"></i>
+                        </a>
+                        <!-- END Menu Toggle -->
+
+                        <!-- Main Menu -->
+                        <ul class="site-nav">
+                            <!-- Toggles menu on small screens -->
+                            <li class="visible-xs visible-sm">
+                                <a href="javascript:void(0)" class="site-menu-toggle text-center">
+                                    <i class="fa fa-times"></i>
+                                </a>
+                            </li> 
+                            <li ng-repeat="menu in menus">
+                                <a href="{{menu.url}}" class="">{{menu.name}}</a> 
+                            </li> 
+                        </ul> 
+                    </nav>
+                    <!-- END Site Navigation -->
+                </div>
+            </header>
+            <!-- END Site Header -->
+
+            <!-- Intro -->
+            <section class="site-section site-section-light site-section-top themed-background-dark">
+                <div class="container">
+                    <h1 class="animation-slideDown"><strong>Artiles</strong>({{categorys.totalCount}})</h1> 
+                </div>
+            </section>
+            <!-- END Intro -->
+
+            <!-- Content -->
+            <section class="site-content site-section">
+                <div class="container">
+                    <div class="row">
+                        <!-- Posts -->
+                        <div class="col-sm-8 col-md-9">
+                            <!-- Blog Post -->
+                            <div ng-repeat="category in categorys.dataList" class="site-block">
+                                <div class="row"> 
+                                    <div class="col-md-8">
+                                        <a href="#none;" ng-click="goRead(category.url)">
+                                            <h3 class="site-heading"><strong>{{category.title}}</strong></h3>
+                                            <p>{{category.content}}</p>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="clearfix">
+                                    <p class="pull-right">
+                                        <a href="#none;" ng-click="goRead(category.url)" class="label label-primary">Read more..</a>
+                                    </p>
+                                    <ul class="list-inline pull-left">
+                                        <li><i class="fa fa-calendar"></i> {{category.date}}</li>
+                                        <li><i class="fa fa-user"></i> by <a href="https://github.com/ANZHONGGEN">An Zhonggen</a></li>
+                                        <li><i class="fa fa-tag"></i> <a ng-click="onCate(category.category)" href="#none;">{{category.category}}</a></li> 
+                                    </ul>
+                                </div>
+                            </div>
+                            <!-- END Blog Post -->
+
+                            
+
+                            <!-- Pagination -->
+                            <div class="text-right">
+                                <ul class="pagination">
+                                    <li><a href="#none" ng-click="search(1)"><i class="fa fa-angle-left"></i></a></li>
+                                    <li ng-repeat="pagei in categorys.pageSizeList" ng-class="{true: 'active', false: ''}[pagei==categorys.pageIndex]"><a ng-click="search(pagei)" href="#none">{{pagei}}</a></li> 
+                                    <li><a href="#none" ng-click="search(categorys.lastIndex)"><i class="fa fa-angle-right"></i></a></li>
+                                </ul>
+                            </div>
+                            <!-- END Pagination -->
+                        </div>
+                        <!-- END Posts -->
+
+                        <!-- Sidebar -->
+                        <div class="col-sm-4 col-md-3">
+                            <aside class="sidebar site-block">
+                                <!-- Search -->
+                                <div class="sidebar-block">
+                                    <form action="blog.html" method="post" onsubmit="return false;">
+                                        <div class="input-group">
+                                            <input type="text" ng-model="searchVal" id="search-term" name="searh-term" class="form-control" placeholder="Search title..">
+                                            <div class="input-group-btn">
+                                                <button ng-click="search()" class="btn btn-primary"><i class="fa fa-search"></i></button>
+                                            </div>
+                                        </div>
+                                    </form>
+                                </div>
+                                <!-- END Search -->
+
+                                <!-- Categories -->
+                                <div class="sidebar-block">
+                                    <h4 class="site-heading"><strong>Categories</strong> </h4>
+                                    <ul class="fa-ul ul-breath">
+                                        <li ng-repeat="data in categroupdatas" ng-click="onCate(data.name)"><i class="fa fa-angle-right fa-li"></i> <a href="#none;">{{data.name}} ({{data.count}})</a></li> 
+                                    </ul>
+                                </div>
+                                <!-- END Categories -->
+
+                                
+                            </aside>
+                        </div>
+                        <!-- END Sidebar -->
+                    </div>
+                </div>
+            </section>
+            <!-- END Content -->
+
+            <!-- Footer -->
+            <footer class="site-footer site-section">
+                <div class="container">
+                    <!-- Footer Links -->
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <h4 class="footer-heading">About Me</h4>
+                            <ul class="footer-nav list-inline">
+                                <li><a href="#none">Anzhonggen</a></li>
+                                <li><a href="mailto:zhg115@gmail.com">zhg115@gmail.com</a></li>
+                                <li><a href="mailto:zhg115@126.com">zhg115@126.com</a></li>
+                            </ul>
+                        </div> 
+                    </div>
+                    <!-- END Footer Links -->
+                </div>
+            </footer>
+            <!-- END Footer -->
+        </div>
+        <!-- END Page Container -->
+
+        <!-- Scroll to top link, initialized in js/app.js - scrollToTop() -->
+        <a href="#" id="to-top"><i class="fa fa-angle-up"></i></a>
+
+        <!-- jQuery, Bootstrap.js, jQuery plugins and Custom JS code -->
+        <script src="js/vendor/jquery-1.11.3.min.js"></script>
+        <script src="js/vendor/bootstrap.min.js"></script>
+        <script src="js/plugins.js"></script>
+        <script src="js/app.js"></script> 
+        <script src="js/vendor/angular.min.js"></script>
+        <script src="js/myapp.js"></script> 
+    </body>
+</html>
