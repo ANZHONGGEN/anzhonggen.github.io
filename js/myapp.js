@@ -1,4 +1,4 @@
-var myapp = angular.module("myTodoApp", []);
+var myapp = angular.module("myTodoApp", ["storage"]);
 
 myapp.controller("myHomeCtrl", function($scope,menuDatas,categoryDatas,blogcontentData) {
       
@@ -79,26 +79,34 @@ myapp.controller("myAboutmeCtrl", function($scope,menuDatas) {
 });
 
 
-myapp.service('menuDatas', function($http,$q) {
+myapp.service('menuDatas', function($http,$q,storage) {
 
 	this.datas = new Array(); 
 
     this.getMenuDatas = function () { 
 
     	var d = $q.defer();
-    	if(this.datas.length==0){
-	    	$http.get("/data/menu.json").then(function (response) { 
-	    		this.datas = response.data; 
-	    		d.resolve(this.datas); 
-		    });
-	    }else{ 
+ 
+
+    	if(this.datas.length==0){ 
+    		if(storage.all("menus").length==0){
+		    	$http.get("/data/menu.json").then(function (response) { 
+		    		this.datas = response.data; 
+		    		storage.save("menus",response.data);
+		    		d.resolve(this.datas); 
+			    });
+		    }else{
+		    	this.datas = storage.all("menus");
+		    	d.resolve(this.datas); 
+		    }
+	    }else{  
 	    	d.resolve(this.datas); 
 	    }
  		return d.promise;
     }
 });
 
-myapp.service('categoryDatas', function($http,$q) {
+myapp.service('categoryDatas', function($http,$q,storage) {
 
 	this.datas = new Array(); 
 	 
@@ -128,12 +136,17 @@ myapp.service('categoryDatas', function($http,$q) {
     this.getCategoryDatas = function () { 
     	var d = $q.defer();
     	if(this.datas.length==0){
-    		 
-	    	$http.get("/data/articles.json").then(function (response) { 
-	    		this.datas = response.data;   
-	    		d.resolve(categoryGroupCount(this.datas));
+    		if(storage.all("articles").length==0){
+		    	$http.get("/data/articles.json").then(function (response) { 
+		    		this.datas = response.data;  
+		    		storage.save("articles",response.data);   
+		    		d.resolve(categoryGroupCount(this.datas));
 
-		    }); 
+			    }); 
+		    }else{
+		    	this.datas = storage.all("articles");
+		    	d.resolve(categoryGroupCount(this.datas)); 
+		    }
 	    }else{ 
 	    	d.resolve(categoryGroupCount(this.datas));
 	    } 
@@ -213,10 +226,16 @@ myapp.service('categoryDatas', function($http,$q) {
     	var d = $q.defer();
     	var reljson = {};
     	if(this.datas.length==0){
-	    	$http.get("/data/articles.json").then(function (response) { 
-	    		this.datas = response.data;   
-  				d.resolve(getDatas(searchVal,category,pageIndex,pageUnit,pageSize));
-		    });
+    		if(storage.all("articles").length==0){
+		    	$http.get("/data/articles.json").then(function (response) { 
+		    		this.datas = response.data;   
+		    		storage.save("articles",response.data);  
+	  				d.resolve(getDatas(searchVal,category,pageIndex,pageUnit,pageSize));
+			    });
+		    }else{
+		    	this.datas = storage.all("articles");   
+	  			d.resolve(getDatas(searchVal,category,pageIndex,pageUnit,pageSize));
+		    }
 	    }else{
 	    	d.resolve(getDatas(searchVal,category,pageIndex,pageUnit,pageSize)); 
 	    } 
@@ -225,15 +244,47 @@ myapp.service('categoryDatas', function($http,$q) {
 
 });
 
-myapp.service('blogcontentData', function($http,$q) {
+myapp.service('blogcontentData', function($http,$q,storage) {
   
     this.getBlogData = function (url,i) {  
     	var d = $q.defer();
     	var rel = { "i":i} 
-    	$http.get(url).then(function (response) { 
-    		rel.data = response.data;   
-    		d.resolve(rel);
-	    }); 
+    	if(storage.one(url)==null){
+	    	$http.get(url).then(function (response) { 
+	    		rel.data = response.data;   
+	    		storage.save(url,rel.data);
+	    		d.resolve(rel);
+		    }); 
+	    }else{
+	    	rel.data = storage.one(url);   
+	    	d.resolve(rel);
+	    }
 	    return d.promise;
     }  
 });
+
+angular.module('storage', [])
+.factory('storage', function() {
+  return {
+    all: function(key) {
+      var news = window.localStorage[key];
+      if(news) {
+        return angular.fromJson(news);
+      }
+      return new Array();
+    }
+    ,one:function(key){
+      var news = window.localStorage[key];
+      if(news) {
+        return angular.fromJson(news);
+      }
+      return null;
+    }
+    ,save: function(key,value) {
+      window.localStorage[key] = angular.toJson(value);
+    },
+    clear: function(key) {
+      window.localStorage.removeItem(key);
+    }
+  }
+})
