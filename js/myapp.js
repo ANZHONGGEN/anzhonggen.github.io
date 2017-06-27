@@ -24,7 +24,7 @@ myapp.controller("myHomeCtrl", function($scope,menuDatas,categoryDatas,blogconte
 	    } 
     }) 
     categoryDatas.getCategoryDatas().then(function(data){
-    	console.log(data);
+    //	console.log(data);
     	$scope.categroupdatas = data
     });
 
@@ -155,13 +155,13 @@ myapp.service('categoryDatas', function($http,$q,storage) {
     
 
 
-    var getDatas = function(searchVal,category,pageIndex,pageUnit,pageSize){
+    var getDatas = function(searchVal,category,pageIndex,pageUnit,pageSize,tmpdatas){
  
 
     	if(pageIndex!=null && pageIndex != undefined && pageIndex > 0 ) pIndex = pageIndex;
     	if(pageUnit!=null && pageUnit != undefined && pageUnit > 0) pUnit = pageUnit
     	if(pageSize!=null && pageIndex != undefined && pageIndex > 0) pSize = pageSize;
-    	var tmpdatas = this.datas;   
+    	 
 
     	var data;
     	var selectdatas = new Array();
@@ -230,14 +230,14 @@ myapp.service('categoryDatas', function($http,$q,storage) {
 		    	$http.get("/data/articles.json").then(function (response) { 
 		    		this.datas = response.data;   
 		    		storage.save("articles",response.data);  
-	  				d.resolve(getDatas(searchVal,category,pageIndex,pageUnit,pageSize));
+	  				d.resolve(getDatas(searchVal,category,pageIndex,pageUnit,pageSize,this.datas));
 			    });
 		    }else{
-		    	this.datas = storage.all("articles");   
-	  			d.resolve(getDatas(searchVal,category,pageIndex,pageUnit,pageSize));
+		    	this.datas = storage.all("articles");  
+	  			d.resolve(getDatas(searchVal,category,pageIndex,pageUnit,pageSize,this.datas));
 		    }
 	    }else{
-	    	d.resolve(getDatas(searchVal,category,pageIndex,pageUnit,pageSize)); 
+	    	d.resolve(getDatas(searchVal,category,pageIndex,pageUnit,pageSize,this.datas)); 
 	    } 
 	    return d.promise;
     }
